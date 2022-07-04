@@ -69,11 +69,47 @@ class GameVestiario extends Phaser.Scene {
     })
     this.anims.create({
       key: 'kick',
-      frames: this.anims.generateFrameNumbers('dude', { frames: [12] }),
+      frames: this.anims.generateFrameNumbers('dude', { frames: [10, 11, 12, 13, 10] }),
+      frameRate: 8,
+      // repeat: -1,
+      repeatDelay: 2000
+    })
+    this.anims.create({
+      key: 'punch',
+      frames: this.anims.generateFrameNumbers('dude', { frames: [15, 16, 17, 18, 17, 15] }),
+      frameRate: 8,
+      // repeat: -1,
+      repeatDelay: 2000
+    });
+    this.anims.create({
+      key: 'kick_enemy',
+      frames: this.anims.generateFrameNumbers('enemy', { frames: [10, 11, 12, 13, 10] }),
       frameRate: 8,
       repeat: -1,
+      repeatDelay: 2000
     })
+    this.anims.create({
+      key: 'punch_enemy',
+      frames: this.anims.generateFrameNumbers('enemy', { frames: [15, 16, 17, 18, 17, 15] }),
+      frameRate: 8,
+      repeat: -1,
+      repeatDelay: 2000
+    });
+
+    this.player.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim) {
+      console.log(anim.key)
+
+      if (anim.key === 'kick' || anim.key === 'punch') {
+        this.damageEnemy(this.enemy);
+        this.damageEnemy(this.enemy2);
+      }
+    }, this);
   }
+
+  addText() {
+    this.add.bitmapText(320, 330, 'carrier_command', 'level 2 completed', 12)
+  }
+
   update() {
     // making the player to follow the user whe he is alive
     if (this.enemy?.alive) this.enemyFollows(this.enemy)
@@ -89,8 +125,8 @@ class GameVestiario extends Phaser.Scene {
       this.player.setTint(0xff0000);
     }
     if (this.player.anims.currentAnim.key == 'kick') {
-      this.damageEnemy(this.enemy);
-      this.damageEnemy(this.enemy2);
+      // this.damageEnemy(this.enemy);
+      // this.damageEnemy(this.enemy2);
       if (this.enemy2) {
         if (this.enemy2.alive == false) {
           this.destroySprite(this.enemy2.hp.bar)
@@ -133,14 +169,14 @@ class GameVestiario extends Phaser.Scene {
           this.enemy2 = this.physics.add.existing(new Enemy(this, 400, 500, 'enemy'))
 
           this.physics.world.enableBody(this.enemy);
-          this.physics.add.collider(this.player, this.enemy, this.hitEnemy, null, this);
-          this.physics.add.collider(this.player, this.enemy2, this.hitEnemy, null, this);
+          // this.physics.add.collider(this.player, this.enemy, this.hitEnemy, null, this);
+          // this.physics.add.collider(this.player, this.enemy2, this.hitEnemy, null, this);
         }
 
       }
     }
     else {
-      this.player.damage(2)
+      this.player.damage(0)
     }
   }
 
@@ -161,13 +197,13 @@ class GameVestiario extends Phaser.Scene {
     if (!enemy) return
     if (!enemy.alive) return
     if (!Phaser.Geom.Intersects.RectangleToRectangle(this.player.getBounds(), enemy.getBounds())) return
-    enemy.damage(2)
+    enemy.damage(10)
     let oneOrZero = (Math.random() >= 0.5) ? 1 : 0
     if (oneOrZero === 1) {
-      enemy.anims.play('kick');
+      enemy.anims.play('kick_enemy');
     }
     else {
-      enemy.anims.play('punch');
+      enemy.anims.play('punch_enemy');
     }
   }
 }

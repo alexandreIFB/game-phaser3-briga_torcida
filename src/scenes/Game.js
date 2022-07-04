@@ -43,6 +43,7 @@ class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 350, 800, 250)
     // creating player and enemy
     this.player = this.physics.add.existing(new Player(this, 100, 450, 'dude'))
+
     this.enemy = this.physics.add.existing(new Enemy(this, 400, 450, 'enemy'))
     // setting the body of the enemy
     this.physics.world.enableBody(this.enemy);
@@ -69,9 +70,17 @@ class GameScene extends Phaser.Scene {
     })
     this.anims.create({
       key: 'kick',
-      frames: this.anims.generateFrameNumbers('dude', { frames: [12] }),
+      frames: this.anims.generateFrameNumbers('dude', { frames: [10, 11, 12, 13, 10] }),
       frameRate: 8,
       repeat: -1,
+      repeatDelay: 2000
+    })
+    this.anims.create({
+      key: 'kick_enemy',
+      frames: this.anims.generateFrameNumbers('enemy', { frames: [10, 11, 12, 13, 10] }),
+      frameRate: 8,
+      repeat: -1,
+      repeatDelay: 2000
     })
   }
   update() {
@@ -164,7 +173,7 @@ class GameScene extends Phaser.Scene {
     enemy.damage(2)
     let oneOrZero = (Math.random() >= 0.5) ? 1 : 0
     if (oneOrZero === 1) {
-      enemy.anims.play('kick');
+      enemy.anims.play('kick_enemy');
     }
     else {
       enemy.anims.play('punch');

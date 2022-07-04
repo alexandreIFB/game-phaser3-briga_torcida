@@ -42,7 +42,11 @@ class GameEstacionamento extends Phaser.Scene {
     this.physics.world.setBounds(0, 350, 800, 250)
     // creating player and enemy
     this.player = this.physics.add.existing(new Player(this, 100, 450, 'dude'))
+
     this.player.setScale(3)
+
+
+
     this.enemy = this.physics.add.existing(new Enemy(this, 400, 450, 'enemy'))
     //this.enemy.setScale(3)
     // setting the body of the enemy
@@ -74,6 +78,8 @@ class GameEstacionamento extends Phaser.Scene {
       frameRate: 8,
       repeat: -1,
     })
+
+
   }
   update() {
     // making the player to follow the user whe he is alive
