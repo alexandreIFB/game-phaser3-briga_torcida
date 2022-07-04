@@ -1,6 +1,10 @@
 import Phaser from 'phaser'
 
-import HelloWorldScene from './scenes/HelloWorldScene'
+import Game from './scenes/Game'
+import GameEstacionamento from './scenes/GameEstacionamento'
+import GameVestiario from './scenes/GameVestiario'
+import Preloader from './scenes/Preloader'
+import SelectedCharacter from './scenes/SelectCharacter'
 
 const config = {
 	type: Phaser.AUTO,
@@ -9,10 +13,10 @@ const config = {
 	physics: {
 		default: 'arcade',
 		arcade: {
-			gravity: { y: 200 }
+			gravity: { y: 0 }
 		}
 	},
-	scene: [HelloWorldScene]
+	scene: [Preloader, SelectedCharacter, Game, GameVestiario, GameEstacionamento]
 }
 
 export default new Phaser.Game(config)
