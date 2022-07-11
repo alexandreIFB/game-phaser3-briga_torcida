@@ -2,6 +2,7 @@ import HealthBar from "../components/healthBar"
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   keyPressed = false
+  win = false
   constructor(scene, x = 0, y = 0, texture = 'dude') {
     super(scene, x, y, texture)
 
@@ -11,13 +12,38 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.alive = true
     scene.events.on('update', this.update, this)
     this.setScale(3)
+
+    this.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim) {
+      console.log(anim.key)
+
+      if (anim.key === 'kick' || anim.key === 'punch') {
+        this.scene.damageEnemy(this.scene.enemy, 30);
+        this.scene.damageEnemy(this.scene.enemy2, 30);
+      } else if (anim.key === 'punch') {
+        this.scene.damageEnemy(this.scene.enemy, 15);
+        this.scene.damageEnemy(this.scene.enemy2, 15);
+      }
+    }, this);
   }
+
+  gameOver() {
+    this.scene.add.bitmapText(300, 300, 'carrier_command', 'GAME OVER', 22);
+    return;
+  }
+
   damage(amount) {
     if (this.hp.decrease(amount)) {
       this.alive = false
+      this.hp.bar.destroy()
+      this.scene.physics.pause();
+      this.anims.play('die');
+      this.setTint(0xff0000);
+      this.gameOver()
     }
   }
   update() {
+    if (this.win) return;
+
     const speed = 2.5
 
     if (this.alive === false) {
@@ -33,25 +59,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.x += speed
       this.flipX = true
       this.anims.play('walk', true);
-    }
-    // else {
-    //   this.setVelocityX(0);
-    //   this.anims.play('idle');
-    // }
-    if (this.scene.keyA.isDown) {
+    } else if (this.scene.cursors.up.isDown) {
+      this.y -= speed
+      this.anims.play('walk')
+    } else if (this.scene.cursors.down.isDown) {
+      this.y += speed
+      this.anims.play('walk')
+    } else if (this.scene.keyA.isDown) {
       this.keyPressed = true
       this.anims.play('kick', true);
     } else if (this.scene.keyS.isDown) {
       this.keyPressed = true
-      this.anims.play('punch');
-    }
-    if (this.scene.cursors.up.isDown) {
-      this.y -= speed
-      this.anims.play('walk')
-    }
-    else if (this.scene.cursors.down.isDown) {
-      this.y += speed
-      this.anims.play('walk')
+      this.anims.play('punch', true);
+    } else if (this.scene.keyD.isDown) {
+      this.keyPressed = true
+      this.anims.play('idle', true);
     }
   }
 }
