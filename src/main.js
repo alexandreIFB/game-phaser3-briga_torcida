@@ -5,6 +5,7 @@ import GameEstacionamento from './scenes/GameEstacionamento'
 import GameVestiario from './scenes/GameVestiario'
 import Preloader from './scenes/Preloader'
 import SelectedCharacter from './scenes/SelectCharacter'
+import TesteTile from './scenes/TesteTiles'
 
 const config = {
 	type: Phaser.AUTO,
@@ -18,7 +19,7 @@ const config = {
 			debug: true
 		}
 	},
-	scene: [Preloader, SelectedCharacter, Game, GameVestiario, GameEstacionamento]
+	scene: [Preloader, SelectedCharacter, Game, GameVestiario, GameEstacionamento, TesteTile]
 }
 
 export default new Phaser.Game(config)

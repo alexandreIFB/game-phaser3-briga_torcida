@@ -24,6 +24,7 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('estacionamento', 'cenario/estacionamento.jpg')
     this.load.image('corredor', 'cenario/corredor.png')
     this.load.image('ground', 'cenario/platform.png')
+
   }
 
   create() {

@@ -18,7 +18,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.kickActive = false;
       console.log(anim.key)
 
-      if (anim.key === 'kick_enemy' || anim.key === 'punch_enemy') {
+      if (anim.key === 'kick_enemy') {
         scene.damagePlayer(scene.player, this, 10)
       } else if (anim.key === 'punch_enemy') {
         scene.damagePlayer(scene.player, this, 5)
