@@ -19,6 +19,7 @@ class TesteTile extends Phaser.Scene {
   sx = 0;
   mapWidth = 25;
   mapHeight = 1;
+  health;
 
   constructor() {
     super({ key: 'testeTile' })
@@ -26,6 +27,7 @@ class TesteTile extends Phaser.Scene {
   init(data) {
     this.selectedCharacter = data.character
     this.selectedEnemy = data.enemy
+    this.health = this.physics.add.staticGroup()
 
     console.log(this.selectedCharacter)
     this.fullWidth = 200
@@ -101,19 +103,33 @@ class TesteTile extends Phaser.Scene {
 
   createMap() {
 
-    const mapChao = this.make.tilemap({ key: 'map_chao', tileHeight: 32, tileWidth: 32 })
-    const tileset = mapChao.addTilesetImage('tiles');
-    const layerChao = mapChao.createLayer(0, tileset, 0, 0); // layer index, tileset, x, y
+
+    const map = this.make.tilemap({ key: "map" });
+    const tileset = map.addTilesetImage('map', "tiles");
 
 
-    const mapParede = this.make.tilemap({ key: 'map_parede', tileHeight: 32, tileWidth: 32 })
-    const tilesetParede = mapParede.addTilesetImage('tiles');
-    const layerParede = mapParede.createLayer(0, tilesetParede, 0, 0); // layer index, tileset, x, y
+    const ChaoLayer = map.createLayer("chao", tileset);
+    const TrashLayer = map.createLayer("trash", tileset);
+    const ParedeLayer = map.createLayer("parede", tileset);
+    const ArmarioLayer = map.createLayer("armario", tileset);
+    const HealthLayer = map.getObjectLayer('LifeLayer')['objects'];
 
 
-    const mapArmario = this.make.tilemap({ key: 'map_armario', tileHeight: 32, tileWidth: 32 })
-    const tilesetArmario = mapArmario.addTilesetImage('tiles');
-    const layerArmario = mapArmario.createLayer(0, tilesetArmario, 0, 0); // layer index, tileset, x, y
+
+    HealthLayer.forEach(object => {
+      let obj = this.health.create(object.x, object.y, "health");
+      obj.setScale(object.width / 32, object.height / 32);
+      obj.setOrigin(0);
+      obj.body.width = object.width;
+      obj.body.height = object.height;
+    });
+
+  }
+
+  collectLife(player, healh) {
+    healh.destroy(healh.x, healh.y); // remove the tile/coin
+    player.cura(10);
+    return false;
   }
 
   preload() {
@@ -123,6 +139,9 @@ class TesteTile extends Phaser.Scene {
     this.load.tilemapCSV('map_chao', 'cenario/definitivo_chao.csv')
     this.load.tilemapCSV('map_armario', 'cenario/definitivo_armario.csv')
     this.load.tilemapCSV('map_parede', 'cenario/definitivo_parede.csv')
+    this.load.tilemapCSV('map_life', 'cenario/definitivo_life.csv')
+    this.load.image("health", "cenario/health.png");
+    this.load.tilemapTiledJSON("map", "cenario/definitivo.json");
   }
   create() {
 
@@ -148,6 +167,8 @@ class TesteTile extends Phaser.Scene {
     this.physics.world.enableBody(this.player);
     this.physics.world.enableBody(this.enemy);
     this.player.setCollideWorldBounds(true)
+    this.player.setImmovable();
+    this.physics.add.overlap(this.player, this.health, this.collectLife, null, this)
     //--- this.physics.world.setBounds(0, 260, 800, 340)
     //this is good to use when using the zoom on the player
     this.cameras.main.startFollow(this.player, true, 0.08, 0.08);

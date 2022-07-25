@@ -20,6 +20,14 @@ export default class HealthBar {
     return (this.value === 0);
   }
 
+  increase(amount) {
+    this.value += amount;
+    if (this.value > 100) {
+      this.value = 100;
+    }
+    this.draw();
+  }
+
   draw() {
     this.bar.clear();
     //  BG

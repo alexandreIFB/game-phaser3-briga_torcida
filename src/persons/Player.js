@@ -41,6 +41,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.gameOver()
     }
   }
+
+  cura(amount) {
+    this.hp.increase(amount)
+  }
+
   update() {
     if (this.win) return;
 
@@ -59,13 +64,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.x += speed
       this.flipX = true
       this.anims.play('walk', true);
-    } else if (this.scene.cursors.up.isDown) {
+    }
+
+    if (this.scene.cursors.up.isDown) {
       this.y -= speed
       this.anims.play('walk')
     } else if (this.scene.cursors.down.isDown) {
       this.y += speed
       this.anims.play('walk')
-    } else if (this.scene.keyA.isDown) {
+    }
+
+    if (this.scene.keyA.isDown) {
       this.keyPressed = true
       this.anims.play('kick', true);
     } else if (this.scene.keyS.isDown) {
