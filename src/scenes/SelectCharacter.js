@@ -38,7 +38,7 @@ class SelectedCharacter extends Phaser.Scene {
 
   onStarClick() {
     this.sky.destroy()
-    this.scene.start('testeTile', {
+    this.scene.start('gameVestiario', {
       character: this.times[this.timeIndex],
       enemy: this.timeIndex === 8 ?
         this.times[0] :

@@ -3,13 +3,11 @@ import HealthBar from "../components/healthBar"
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   keyPressed = false
   win = false
-
   damageBase = 10
 
 
   constructor(scene, x = 0, y = 0, texture = 'dude') {
     super(scene, x, y, texture)
-
     scene.add.existing(this)
     scene.physics.add.existing(this)
     this.hp = new HealthBar(scene, x - 40, y - 50)
@@ -35,7 +33,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   gameOver() {
-    this.scene.add.bitmapText(300, 300, 'carrier_command', 'GAME OVER', 22);
+    const gameOver = this.scene.add.bitmapText(this.x, this.y - 100, 'carrier_command', 'GAME OVER', 22);
+    gameOver.setInteractive({ useHandCursor: true });
+
+    gameOver.on('pointerdown', () => this.scene.scene.start('selectedCharacter'));
     return;
   }
 
@@ -43,9 +44,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (this.hp.decrease(amount)) {
       this.alive = false
       this.hp.bar.destroy()
-      //this.scene.physics.pause();
+      this.scene.physics.pause();
       this.anims.play('die');
       this.setTint(0xff0000);
+
       this.gameOver()
     }
   }
@@ -61,7 +63,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   update() {
     if (this.win) return;
 
-    const speed = 1.5
+    const speed = 2
 
     if (this.alive === false) {
       return;

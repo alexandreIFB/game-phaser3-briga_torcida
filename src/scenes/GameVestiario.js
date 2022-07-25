@@ -15,12 +15,22 @@ class GameVestiario extends Phaser.Scene {
   keyW
   counter = 0
   contEnemys
+
+  sx = 0;
+  mapWidth = 25;
+  mapHeight = 1;
+  health;
+  punch;
+  TrashLayer;
+
   constructor() {
     super({ key: 'gameVestiario' })
   }
   init(data) {
     this.selectedCharacter = data.character
     this.selectedEnemy = data.enemy
+    this.health = this.physics.add.staticGroup()
+    this.punch = this.physics.add.staticGroup()
 
     console.log(this.selectedCharacter)
     this.fullWidth = 200
@@ -31,11 +41,7 @@ class GameVestiario extends Phaser.Scene {
     this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
   }
 
-  preload() {
-    this.load.spritesheet('enemy', `images/player/${this.selectedEnemy}.png`, { frameWidth: 48, frameHeight: 48 })
-    this.load.spritesheet('dude', `images/player/${this.selectedCharacter}.png`, { frameWidth: 48, frameHeight: 48 })
-  }
-  create() {
+  createAnimsEnemyAndPlayer() {
     this.anims.create({
       key: 'die',
       frames: this.anims.generateFrameNumbers('dude', { frames: [35, 36, 37] }),
@@ -95,33 +101,153 @@ class GameVestiario extends Phaser.Scene {
       frameRate: 2,
       repeat: -1
     })
+    this.anims.create({
+      key: 'idle_enemy',
+      frames: this.anims.generateFrameNumbers('enemy', { frames: [5, 6, 7, 8] }),
+      frameRate: 8,
+      // repeat: -1,
+      repeatDelay: 2000
+    })
+  }
 
-    this.input.setDefaultCursor('url(assets/images/healthBar/cursor_pointerFlat_shadow.png), pointer');
-    this.corredor = this.add.image(400, 300, 'corredor');
-    // make the player to not go to other areas
-    this.physics.world.setBounds(0, 350, 800, 250)
-    // creating player and enemy
-    this.player = this.physics.add.existing(new Player(this, 100, 450, 'dude'))
-    this.enemy = this.newSprite(400, 450)
-    this.contEnemys = 1;
-    this.killEnemys = 0;
-    // setting the body of the enemy
+
+  createMap() {
+
+
+    const map = this.make.tilemap({ key: "map" });
+    const tileset = map.addTilesetImage('map', "tiles");
+
+
+    const ChaoLayer = map.createLayer("chao", tileset);
+    this.TrashLayer = map.createLayer("trash", tileset).setCollision([60, 61, 62, 63, 64, 65, 66])
+
+    const debugGraphics = this.add.graphics().setAlpha(0.75);
+    this.TrashLayer.renderDebug(debugGraphics, {
+      tileColor: null, // Color of non-colliding tiles
+      collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
+      faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+    });
+    const ParedeLayer = map.createLayer("parede", tileset);
+    const ArmarioLayer = map.createLayer("armario", tileset)
+
+    const HealthLayer = map.getObjectLayer('LifeLayer')['objects'];
+    const PunchLayer = map.getObjectLayer('PunchLayer')['objects'];
+
+
+
+    HealthLayer.forEach(object => {
+      let obj = this.health.create(object.x, object.y, "health");
+      obj.setScale(object.width / 32, object.height / 32);
+      obj.setOrigin(0);
+      obj.body.width = object.width;
+      obj.body.height = object.height;
+    });
+
+    PunchLayer.forEach(object => {
+      let obj = this.punch.create(object.x, object.y, "punch");
+      obj.setScale(object.width / 32, object.height / 32);
+      obj.setOrigin(0);
+      obj.body.width = object.width;
+      obj.body.height = object.height;
+    });
+
+  }
+
+  collectLife(player, healh) {
+    healh.destroy(healh.x, healh.y); // remove the tile/coin
+    player.cura(10);
+    return false;
+  }
+
+  collectPunch(player, punch) {
+    punch.destroy(punch.x, punch.y); // remove the tile/coin
+    player.upDamage()
+    return false;
+  }
+
+  createEnymies() {
+    this.enemy = this.newSprite(300, 450)
+    this.enemy2 = this.newSprite(600, 450)
+    this.enemy3 = this.newSprite(1100, 300)
+    this.enemy4 = this.newSprite(1600, 300, 5)
     this.physics.world.enableBody(this.player);
     this.physics.world.enableBody(this.enemy);
+    this.physics.world.enableBody(this.enemy2);
+    this.physics.world.enableBody(this.enemy3);
+    this.physics.world.enableBody(this.enemy4);
+    this.enemy.setCollideWorldBounds(true)
+    this.enemy2.setCollideWorldBounds(true)
+    this.enemy3.setCollideWorldBounds(true)
+    this.enemy4.setCollideWorldBounds(true)
+  }
+
+  preload() {
+    this.load.spritesheet('enemy', `images/player/${this.selectedEnemy}.png`, { frameWidth: 48, frameHeight: 48 })
+    this.load.spritesheet('dude', `images/player/${this.selectedCharacter}.png`, { frameWidth: 48, frameHeight: 48 })
+    this.load.image('tiles', 'cenario/map.png')
+    this.load.tilemapCSV('map_chao', 'cenario/definitivo_chao.csv')
+    this.load.tilemapCSV('map_armario', 'cenario/definitivo_armario.csv')
+    this.load.tilemapCSV('map_parede', 'cenario/definitivo_parede.csv')
+    this.load.tilemapCSV('map_life', 'cenario/definitivo_life.csv')
+    this.load.image("health", "cenario/health.png");
+    this.load.image("punch", "cenario/punch.png");
+    this.load.tilemapTiledJSON("map", "cenario/definitivo.json");
+  }
+
+  create() {
+
+
+    this.createAnimsEnemyAndPlayer()
+
+    this.createMap()
+
+    this.input.setDefaultCursor('url(assets/images/healthBar/cursor_pointerFlat_shadow.png), pointer')
+
+    this.physics.world.setBounds(0, 0, 2400, 600);
+
+    //layer.skipCull = true;
+
+    // make the player to not go to other areas
+    //this.physics.world.setBounds(0, 350, 800, 250)
+    // creating player and enemy
+    this.player = this.physics.add.existing(new Player(this, 100, 300, 'dude'))
+
+    this.createEnymies()
+    this.contEnemys = 4;
+    this.killEnemys = 0;
+    // setting the body of the enemy
+
     this.player.setCollideWorldBounds(true)
-    this.physics.world.setBounds(0, 260, 800, 340)
+    this.player.setImmovable();
+    this.physics.add.overlap(this.player, this.health, this.collectLife, null, this)
+    this.physics.add.overlap(this.player, this.punch, this.collectPunch, null, this)
+    this.physics.add.collider(this.enemy, this.TrashLayer, () => (console.log('entrei aq')))
+
+
+    //--- this.physics.world.setBounds(0, 260, 800, 340)
     //this is good to use when using the zoom on the player
-    this.cameras.main.startFollow(this.player, true, 0.09, 0.09);
-    this.cameras.main.setBounds(0, 0, 800, 600);
+    this.cameras.main.startFollow(this.player, true, 0.32, 0.32);
+    this.cameras.main.setBounds(0, 0, 2400, 600);
     //this.cameras.main.setZoom(2);
 
 
     // adding collider effect between the player and the enemy
-    this.physics.add.collider(this.player, this.enemy, () => this.hitPlayer(this.enemy));
-    this.physics.add.overlap(this.player, this.enemy, () => { console.log('Entrei') }, () => { console.log('Process') })
+    this.physics.add.collider(this.player, this.enemy, () => this.hitPlayer(this.enemy), () => {
+      this.hitPlayer(this.enemy)
+    });
+    this.physics.add.collider(this.player, this.enemy2, () => this.hitPlayer(this.enemy2), () => {
+      this.hitPlayer(this.enemy2)
+    });
+    this.physics.add.collider(this.player, this.enemy3, () => this.hitPlayer(this.enemy3), () => {
+      this.hitPlayer(this.enemy3)
+    });
+    this.physics.add.collider(this.player, this.enemy4, () => this.hitPlayer(this.enemy4), () => {
+      this.hitPlayer(this.enemy4)
+    });
   }
 
   hitPlayer(enemy) {
+    enemy.setImmovable();
     //console.log('entrei')
     //let oneOrZero = 2;
     let oneOrZero = (Math.random() >= 0.5) ? 1 : 0
@@ -139,33 +265,44 @@ class GameVestiario extends Phaser.Scene {
   }
 
   update() {
-    // making the player to follow the user whe he is alive
-    if (this.enemy?.alive) this.enemyFollows(this.enemy)
-    if (this.enemy2 !== undefined) {
-      if (this.enemy2.alive) this.enemyFollows(this.enemy2)
-    }
+    if (this.enemy?.alive && !this.enemy?.kickActive) this.enemyFollows(this.enemy)
+    if (this.player.x >= 500 && this.enemy2?.alive && !this.enemy2?.kickActive) this.enemyFollows(this.enemy2)
+    if (this.player.x >= 1000 && this.enemy3?.alive && !this.enemy3?.kickActive) this.enemyFollows(this.enemy3)
+    if (this.player.x >= 1500 && this.enemy4?.alive && !this.enemy4?.kickActive) this.enemyFollows(this.enemy4)
+    // if (this.enemy?.alive) this.enemyFollows(this.enemy)
+    // if (this.enemy2 !== undefined) {
+    //   if (this.enemy2.alive) this.enemyFollows(this.enemy2)
+    // }
   }
 
   destroySprite(sprite) {
     sprite.hp.bar.destroy()
     sprite.destroy();
   }
-  enemyFollows(a) {
-    this.physics.moveToObject(a, this.player, 50);
+  enemyFollows(enemy) {
+    if (!enemy.kickActive) {
+      enemy.anims.play('walk_enemy', true);
+    }
+    enemy.followPlayer = true;
+    if (enemy.x < this.player.x) {
+      enemy.flipX = true
+    } else {
+      enemy.flipX = false
+    }
+    this.physics.moveToObject(enemy, this.player, 100)
   }
   level3() {
-    this.corredor.destroy()
-    this.scene.start('gameEstacionamento', {
+    //this.corredor.destroy()
+    this.scene.start('gameParking', {
       character: this.selectedCharacter,
       enemy: this.selectedEnemy
     });
   }
 
   newSprite(x, y, scale = 3) {
-    let enemy = this.physics.add.existing(new Enemy(this, x, y, 'enemy'))
+    let enemy = this.physics.add.existing(new Enemy(this, x, y, 'enemy', scale))
     this.physics.world.enableBody(enemy);
     this.physics.add.collider(this.player, enemy, () => this.hitPlayer(enemy));
-    enemy.setScale(scale)
     return enemy
   }
 
@@ -179,17 +316,17 @@ class GameVestiario extends Phaser.Scene {
     if (!enemy.alive) {
       this.destroySprite(enemy);
       this.killEnemys = this.killEnemys + 1;
-      if (this.contEnemys === 1) {
-        this.enemy = this.newSprite(350, 500)
-        this.enemy2 = this.newSprite(400, 500, 5)
-        this.contEnemys = this.contEnemys + 2;
-      }
-      if (this.killEnemys === this.contEnemys) {
+      // if (this.contEnemys === 1) {
+      //   this.enemy = this.newSprite(350, 300)
+      //   this.enemy2 = this.newSprite(400, 300, 5)
+      //   this.contEnemys = this.contEnemys + 2;
+      // }
+      if (this.killEnemys === 4) {
         this.physics.pause();
         this.player.anims.play('win')
         this.player.win = true;
-        var config = this.add.bitmapText(this.player.x, this.player.y - 100, 'carrier_command', 'level 2 completed', 12);
-        var level2 = this.add.bitmapText(this.player.x, this.player.y - 70, 'carrier_command', 'start level 3', 12);
+        var config = this.add.bitmapText(this.player.x, this.player.y - 100, 'carrier_command', 'level 1 completed', 12);
+        var level2 = this.add.bitmapText(this.player.x, this.player.y - 70, 'carrier_command', 'start level 2', 12);
         level2.setInteractive({ useHandCursor: true });
         level2.on('pointerdown', () => this.level3());
         return;
@@ -197,6 +334,7 @@ class GameVestiario extends Phaser.Scene {
       return
     }
   }
+
 
   damagePlayer(player, enemy, damage) {
     if (!player) return
