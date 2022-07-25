@@ -26,6 +26,7 @@ class GameVestiario extends Phaser.Scene {
   constructor() {
     super({ key: 'gameVestiario' })
   }
+
   init(data) {
     this.selectedCharacter = data.character
     this.selectedEnemy = data.enemy
@@ -122,11 +123,7 @@ class GameVestiario extends Phaser.Scene {
     this.TrashLayer = map.createLayer("trash", tileset).setCollision([60, 61, 62, 63, 64, 65, 66])
 
     const debugGraphics = this.add.graphics().setAlpha(0.75);
-    this.TrashLayer.renderDebug(debugGraphics, {
-      tileColor: null, // Color of non-colliding tiles
-      collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
-      faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-    });
+
     const ParedeLayer = map.createLayer("parede", tileset);
     const ArmarioLayer = map.createLayer("armario", tileset)
 
