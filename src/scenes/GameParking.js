@@ -1,7 +1,7 @@
 import Enemy from "../persons/Enemy"
 import Player from "../persons/Player"
 
-class TesteTile extends Phaser.Scene {
+class GameParking extends Phaser.Scene {
   player
   stars
   bombs
@@ -24,7 +24,7 @@ class TesteTile extends Phaser.Scene {
   TrashLayer;
 
   constructor() {
-    super({ key: 'testeTile' })
+    super({ key: 'gameParking' })
   }
   init(data) {
     this.selectedCharacter = data.character
@@ -114,42 +114,13 @@ class TesteTile extends Phaser.Scene {
   createMap() {
 
 
-    const map = this.make.tilemap({ key: "map" });
-    const tileset = map.addTilesetImage('map', "tiles");
+    const map = this.make.tilemap({ key: 'level2' });
+    const tileset = map.addTilesetImage('tilemap', 'tilesetNameInPhaser');
 
 
-    const ChaoLayer = map.createLayer("chao", tileset);
-    this.TrashLayer = map.createLayer("trash", tileset).setCollision([60, 61, 62, 63, 64, 65, 66])
-
-    //const debugGraphics = this.add.graphics().setAlpha(0.75);
-    // this.TrashLayer.renderDebug(debugGraphics, {
-    //   tileColor: null, // Color of non-colliding tiles
-    //   collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
-    //   faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-    // });
-    const ParedeLayer = map.createLayer("parede", tileset);
-    const ArmarioLayer = map.createLayer("armario", tileset)
-
-    const HealthLayer = map.getObjectLayer('LifeLayer')['objects'];
-    const PunchLayer = map.getObjectLayer('PunchLayer')['objects'];
-
-
-
-    HealthLayer.forEach(object => {
-      let obj = this.health.create(object.x, object.y, "health");
-      obj.setScale(object.width / 32, object.height / 32);
-      obj.setOrigin(0);
-      obj.body.width = object.width;
-      obj.body.height = object.height;
-    });
-
-    PunchLayer.forEach(object => {
-      let obj = this.punch.create(object.x, object.y, "punch");
-      obj.setScale(object.width / 32, object.height / 32);
-      obj.setOrigin(0);
-      obj.body.width = object.width;
-      obj.body.height = object.height;
-    });
+    const ChaoLayer = map.createLayer("ChaoLayer", tileset);
+    const CarsLayer = map.createLayer("CarsLayer", tileset)
+    const PosteLayer = map.createLayer("PosteLayer", tileset);
 
   }
 
@@ -184,14 +155,8 @@ class TesteTile extends Phaser.Scene {
   preload() {
     this.load.spritesheet('enemy', `images/player/${this.selectedEnemy}.png`, { frameWidth: 48, frameHeight: 48 })
     this.load.spritesheet('dude', `images/player/${this.selectedCharacter}.png`, { frameWidth: 48, frameHeight: 48 })
-    this.load.image('tiles', 'cenario/map.png')
-    this.load.tilemapCSV('map_chao', 'cenario/definitivo_chao.csv')
-    this.load.tilemapCSV('map_armario', 'cenario/definitivo_armario.csv')
-    this.load.tilemapCSV('map_parede', 'cenario/definitivo_parede.csv')
-    this.load.tilemapCSV('map_life', 'cenario/definitivo_life.csv')
-    this.load.image("health", "cenario/health.png");
-    this.load.image("punch", "cenario/punch.png");
-    this.load.tilemapTiledJSON("map", "cenario/definitivo.json");
+    this.load.image('tilesetNameInPhaser', 'cenario/tilemap.png')
+    this.load.tilemapTiledJSON("level2", "cenario/parking.json");
   }
 
   create() {
@@ -293,7 +258,7 @@ class TesteTile extends Phaser.Scene {
   }
   level3() {
     //this.corredor.destroy()
-    this.scene.start('gameParking', {
+    this.scene.start('gameEstacionamento', {
       character: this.selectedCharacter,
       enemy: this.selectedEnemy
     });
@@ -325,8 +290,8 @@ class TesteTile extends Phaser.Scene {
         this.physics.pause();
         this.player.anims.play('win')
         this.player.win = true;
-        var config = this.add.bitmapText(this.player.x, this.player.y - 100, 'carrier_command', 'level 1 completed', 12);
-        var level2 = this.add.bitmapText(this.player.x, this.player.y - 70, 'carrier_command', 'start level 2', 12);
+        var config = this.add.bitmapText(320, 330, 'carrier_command', 'level 2 completed', 12);
+        var level2 = this.add.bitmapText(320, 370, 'carrier_command', 'start level 3', 12);
         level2.setInteractive({ useHandCursor: true });
         level2.on('pointerdown', () => this.level3());
         return;
@@ -344,4 +309,4 @@ class TesteTile extends Phaser.Scene {
   }
 }
 
-export default TesteTile
+export default GameParking

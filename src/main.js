@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 
 import Game from './scenes/Game'
 import GameEstacionamento from './scenes/GameEstacionamento'
+import GameParking from './scenes/GameParking'
 import GameVestiario from './scenes/GameVestiario'
 import Preloader from './scenes/Preloader'
 import SelectedCharacter from './scenes/SelectCharacter'
@@ -19,7 +20,7 @@ const config = {
 			//debug: true
 		}
 	},
-	scene: [Preloader, SelectedCharacter, Game, GameVestiario, GameEstacionamento, TesteTile]
+	scene: [Preloader, SelectedCharacter, Game, GameVestiario, GameEstacionamento, TesteTile, GameParking]
 }
 
 export default new Phaser.Game(config)
