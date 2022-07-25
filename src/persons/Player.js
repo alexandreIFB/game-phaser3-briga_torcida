@@ -3,6 +3,9 @@ import HealthBar from "../components/healthBar"
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   keyPressed = false
   win = false
+
+  damageBase = 15
+
   constructor(scene, x = 0, y = 0, texture = 'dude') {
     super(scene, x, y, texture)
 
@@ -17,11 +20,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       console.log(anim.key)
 
       if (anim.key === 'kick' || anim.key === 'punch') {
-        this.scene.damageEnemy(this.scene.enemy, 30);
-        this.scene.damageEnemy(this.scene.enemy2, 30);
+        this.scene.damageEnemy(this.scene.enemy, this.damageBase * 2);
+        this.scene.damageEnemy(this.scene.enemy2, this.damageBase * 2);
       } else if (anim.key === 'punch') {
-        this.scene.damageEnemy(this.scene.enemy, 15);
-        this.scene.damageEnemy(this.scene.enemy2, 15);
+        this.scene.damageEnemy(this.scene.enemy, this.damageBase);
+        this.scene.damageEnemy(this.scene.enemy2, this.damageBase);
       }
     }, this);
   }
@@ -35,7 +38,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (this.hp.decrease(amount)) {
       this.alive = false
       this.hp.bar.destroy()
-      this.scene.physics.pause();
+      //this.scene.physics.pause();
       this.anims.play('die');
       this.setTint(0xff0000);
       this.gameOver()
@@ -44,6 +47,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
   cura(amount) {
     this.hp.increase(amount)
+  }
+
+  upDamage() {
+    this.damageBase += 5;
   }
 
   update() {

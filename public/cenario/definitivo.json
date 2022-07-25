@@ -60,6 +60,65 @@
         }, 
         {
          "draworder":"topdown",
+         "id":7,
+         "name":"PunchLayer",
+         "objects":[
+                {
+                 "class":"",
+                 "gid":47,
+                 "height":32,
+                 "id":9,
+                 "name":"",
+                 "rotation":0,
+                 "visible":true,
+                 "width":32,
+                 "x":53,
+                 "y":426
+                }, 
+                {
+                 "class":"",
+                 "gid":47,
+                 "height":32,
+                 "id":11,
+                 "name":"",
+                 "rotation":0,
+                 "visible":true,
+                 "width":32,
+                 "x":548,
+                 "y":607
+                }, 
+                {
+                 "class":"",
+                 "gid":47,
+                 "height":32,
+                 "id":12,
+                 "name":"",
+                 "rotation":0,
+                 "visible":true,
+                 "width":32,
+                 "x":1326,
+                 "y":347
+                }, 
+                {
+                 "class":"",
+                 "gid":47,
+                 "height":32,
+                 "id":13,
+                 "name":"",
+                 "rotation":0,
+                 "visible":true,
+                 "width":32,
+                 "x":1997,
+                 "y":560
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":5,
          "name":"LifeLayer",
          "objects":[
@@ -165,8 +224,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":7,
- "nextobjectid":9,
+ "nextlayerid":8,
+ "nextobjectid":14,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.0",
@@ -175,7 +234,7 @@
         {
          "columns":4,
          "firstgid":1,
-         "image":"..\/..\/map.png",
+         "image":"map.png",
          "imageheight":608,
          "imagewidth":128,
          "margin":0,
@@ -188,7 +247,7 @@
         {
          "columns":4,
          "firstgid":77,
-         "image":"..\/..\/map.png",
+         "image":"map.png",
          "imageheight":608,
          "imagewidth":128,
          "margin":0,
@@ -201,7 +260,20 @@
         {
          "columns":4,
          "firstgid":153,
-         "image":"..\/..\/map.png",
+         "image":"map.png",
+         "imageheight":608,
+         "imagewidth":128,
+         "margin":0,
+         "name":"map",
+         "spacing":0,
+         "tilecount":76,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":4,
+         "firstgid":229,
+         "image":"map.png",
          "imageheight":608,
          "imagewidth":128,
          "margin":0,

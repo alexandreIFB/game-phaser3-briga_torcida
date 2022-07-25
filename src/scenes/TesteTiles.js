@@ -20,6 +20,8 @@ class TesteTile extends Phaser.Scene {
   mapWidth = 25;
   mapHeight = 1;
   health;
+  punch;
+  TrashLayer;
 
   constructor() {
     super({ key: 'testeTile' })
@@ -28,6 +30,7 @@ class TesteTile extends Phaser.Scene {
     this.selectedCharacter = data.character
     this.selectedEnemy = data.enemy
     this.health = this.physics.add.staticGroup()
+    this.punch = this.physics.add.staticGroup()
 
     console.log(this.selectedCharacter)
     this.fullWidth = 200
@@ -109,15 +112,32 @@ class TesteTile extends Phaser.Scene {
 
 
     const ChaoLayer = map.createLayer("chao", tileset);
-    const TrashLayer = map.createLayer("trash", tileset);
+    this.TrashLayer = map.createLayer("trash", tileset).setCollision([60, 61, 62, 63, 64, 65, 66])
+
+    //const debugGraphics = this.add.graphics().setAlpha(0.75);
+    // this.TrashLayer.renderDebug(debugGraphics, {
+    //   tileColor: null, // Color of non-colliding tiles
+    //   collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
+    //   faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+    // });
     const ParedeLayer = map.createLayer("parede", tileset);
-    const ArmarioLayer = map.createLayer("armario", tileset);
+    const ArmarioLayer = map.createLayer("armario", tileset)
+
     const HealthLayer = map.getObjectLayer('LifeLayer')['objects'];
+    const PunchLayer = map.getObjectLayer('PunchLayer')['objects'];
 
 
 
     HealthLayer.forEach(object => {
       let obj = this.health.create(object.x, object.y, "health");
+      obj.setScale(object.width / 32, object.height / 32);
+      obj.setOrigin(0);
+      obj.body.width = object.width;
+      obj.body.height = object.height;
+    });
+
+    PunchLayer.forEach(object => {
+      let obj = this.punch.create(object.x, object.y, "punch");
       obj.setScale(object.width / 32, object.height / 32);
       obj.setOrigin(0);
       obj.body.width = object.width;
@@ -132,6 +152,12 @@ class TesteTile extends Phaser.Scene {
     return false;
   }
 
+  collectPunch(player, punch) {
+    punch.destroy(punch.x, punch.y); // remove the tile/coin
+    player.upDamage()
+    return false;
+  }
+
   preload() {
     this.load.spritesheet('enemy', `images/player/${this.selectedEnemy}.png`, { frameWidth: 48, frameHeight: 48 })
     this.load.spritesheet('dude', `images/player/${this.selectedCharacter}.png`, { frameWidth: 48, frameHeight: 48 })
@@ -141,6 +167,7 @@ class TesteTile extends Phaser.Scene {
     this.load.tilemapCSV('map_parede', 'cenario/definitivo_parede.csv')
     this.load.tilemapCSV('map_life', 'cenario/definitivo_life.csv')
     this.load.image("health", "cenario/health.png");
+    this.load.image("punch", "cenario/punch.png");
     this.load.tilemapTiledJSON("map", "cenario/definitivo.json");
   }
   create() {
@@ -169,9 +196,13 @@ class TesteTile extends Phaser.Scene {
     this.player.setCollideWorldBounds(true)
     this.player.setImmovable();
     this.physics.add.overlap(this.player, this.health, this.collectLife, null, this)
+    this.physics.add.overlap(this.player, this.punch, this.collectPunch, null, this)
+    this.physics.add.collider(this.player, this.TrashLayer, () => (console.log('entrei aq')))
+
+
     //--- this.physics.world.setBounds(0, 260, 800, 340)
     //this is good to use when using the zoom on the player
-    this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+    this.cameras.main.startFollow(this.player, true, 0.32, 0.32);
     this.cameras.main.setBounds(0, 0, 2400, 600);
     //this.cameras.main.setZoom(2);
 
@@ -198,7 +229,6 @@ class TesteTile extends Phaser.Scene {
   }
 
   update() {
-    // making the player to follow the user whe he is alive
     if (this.enemy?.alive) this.enemyFollows(this.enemy)
     if (this.enemy2 !== undefined) {
       if (this.enemy2.alive) this.enemyFollows(this.enemy2)
@@ -210,7 +240,7 @@ class TesteTile extends Phaser.Scene {
     sprite.destroy();
   }
   enemyFollows(a) {
-    this.physics.moveToObject(a, this.player, 50);
+    this.physics.moveToObject(a, this.player, 100)
   }
   level3() {
     //this.corredor.destroy()
