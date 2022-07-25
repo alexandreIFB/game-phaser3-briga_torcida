@@ -18,16 +18,16 @@ class SelectedCharacter extends Phaser.Scene {
 
 
     // Titulo Game
-    var bmpText = this.add.bitmapText(300, 100, 'carrier_command', 'team fight', 12);
+    var bmpText = this.add.bitmapText(300, 100, 'carrier_command', 'Briga de times', 12);
 
     // Texto de start
-    this.start = this.add.bitmapText(300, 160, 'carrier_command', 'start', 12);
+    this.start = this.add.bitmapText(300, 160, 'carrier_command', 'comecar', 12);
 
     // Config Menu Texto
-    var config = this.add.bitmapText(300, 200, 'carrier_command', 'configuration', 12);
+    var config = this.add.bitmapText(300, 200, 'carrier_command', 'configuracao (em construcao)', 12);
 
     // Muda Time texto
-    var mudatime = this.add.bitmapText(300, 240, 'carrier_command', 'change team', 12);
+    var mudatime = this.add.bitmapText(300, 240, 'carrier_command', 'mudar time', 12);
 
     config.setInteractive({ useHandCursor: true })
     this.start.setInteractive({ useHandCursor: true });
