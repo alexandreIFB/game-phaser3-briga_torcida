@@ -118,6 +118,7 @@ class GameVestiario extends Phaser.Scene {
 
     // adding collider effect between the player and the enemy
     this.physics.add.collider(this.player, this.enemy, () => this.hitPlayer(this.enemy));
+    this.physics.add.overlap(this.player, this.enemy, () => { console.log('Entrei') }, () => { console.log('Process') })
   }
 
   hitPlayer(enemy) {
@@ -187,8 +188,8 @@ class GameVestiario extends Phaser.Scene {
         this.physics.pause();
         this.player.anims.play('win')
         this.player.win = true;
-        var config = this.add.bitmapText(320, 330, 'carrier_command', 'level 2 completed', 12);
-        var level2 = this.add.bitmapText(320, 370, 'carrier_command', 'start level 3', 12);
+        var config = this.add.bitmapText(this.player.x, this.player.y - 100, 'carrier_command', 'level 2 completed', 12);
+        var level2 = this.add.bitmapText(this.player.x, this.player.y - 70, 'carrier_command', 'start level 3', 12);
         level2.setInteractive({ useHandCursor: true });
         level2.on('pointerdown', () => this.level3());
         return;

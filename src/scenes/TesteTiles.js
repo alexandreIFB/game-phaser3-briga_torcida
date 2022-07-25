@@ -101,6 +101,13 @@ class TesteTile extends Phaser.Scene {
       frameRate: 2,
       repeat: -1
     })
+    this.anims.create({
+      key: 'idle_enemy',
+      frames: this.anims.generateFrameNumbers('enemy', { frames: [5, 6, 7, 8] }),
+      frameRate: 8,
+      // repeat: -1,
+      repeatDelay: 2000
+    })
   }
 
 
@@ -158,6 +165,22 @@ class TesteTile extends Phaser.Scene {
     return false;
   }
 
+  createEnymies() {
+    this.enemy = this.newSprite(300, 450)
+    this.enemy2 = this.newSprite(600, 450)
+    this.enemy3 = this.newSprite(1100, 300)
+    this.enemy4 = this.newSprite(1600, 300, 5)
+    this.physics.world.enableBody(this.player);
+    this.physics.world.enableBody(this.enemy);
+    this.physics.world.enableBody(this.enemy2);
+    this.physics.world.enableBody(this.enemy3);
+    this.physics.world.enableBody(this.enemy4);
+    this.enemy.setCollideWorldBounds(true)
+    this.enemy2.setCollideWorldBounds(true)
+    this.enemy3.setCollideWorldBounds(true)
+    this.enemy4.setCollideWorldBounds(true)
+  }
+
   preload() {
     this.load.spritesheet('enemy', `images/player/${this.selectedEnemy}.png`, { frameWidth: 48, frameHeight: 48 })
     this.load.spritesheet('dude', `images/player/${this.selectedCharacter}.png`, { frameWidth: 48, frameHeight: 48 })
@@ -170,7 +193,9 @@ class TesteTile extends Phaser.Scene {
     this.load.image("punch", "cenario/punch.png");
     this.load.tilemapTiledJSON("map", "cenario/definitivo.json");
   }
+
   create() {
+
 
     this.createAnimsEnemyAndPlayer()
 
@@ -185,14 +210,13 @@ class TesteTile extends Phaser.Scene {
     // make the player to not go to other areas
     //this.physics.world.setBounds(0, 350, 800, 250)
     // creating player and enemy
-    this.player = this.physics.add.existing(new Player(this, 100, 450, 'dude'))
+    this.player = this.physics.add.existing(new Player(this, 100, 300, 'dude'))
 
-    this.enemy = this.newSprite(400, 450)
-    this.contEnemys = 1;
+    this.createEnymies()
+    this.contEnemys = 4;
     this.killEnemys = 0;
     // setting the body of the enemy
-    this.physics.world.enableBody(this.player);
-    this.physics.world.enableBody(this.enemy);
+
     this.player.setCollideWorldBounds(true)
     this.player.setImmovable();
     this.physics.add.overlap(this.player, this.health, this.collectLife, null, this)
@@ -208,10 +232,22 @@ class TesteTile extends Phaser.Scene {
 
 
     // adding collider effect between the player and the enemy
-    this.physics.add.collider(this.player, this.enemy, () => this.hitPlayer(this.enemy));
+    this.physics.add.collider(this.player, this.enemy, () => this.hitPlayer(this.enemy), () => {
+      this.hitPlayer(this.enemy)
+    });
+    this.physics.add.collider(this.player, this.enemy2, () => this.hitPlayer(this.enemy2), () => {
+      this.hitPlayer(this.enemy2)
+    });
+    this.physics.add.collider(this.player, this.enemy3, () => this.hitPlayer(this.enemy3), () => {
+      this.hitPlayer(this.enemy3)
+    });
+    this.physics.add.collider(this.player, this.enemy4, () => this.hitPlayer(this.enemy4), () => {
+      this.hitPlayer(this.enemy4)
+    });
   }
 
   hitPlayer(enemy) {
+    enemy.setImmovable();
     //console.log('entrei')
     //let oneOrZero = 2;
     let oneOrZero = (Math.random() >= 0.5) ? 1 : 0
@@ -229,18 +265,31 @@ class TesteTile extends Phaser.Scene {
   }
 
   update() {
-    if (this.enemy?.alive) this.enemyFollows(this.enemy)
-    if (this.enemy2 !== undefined) {
-      if (this.enemy2.alive) this.enemyFollows(this.enemy2)
-    }
+    if (this.enemy?.alive && !this.enemy?.kickActive) this.enemyFollows(this.enemy)
+    if (this.player.x >= 500 && this.enemy2?.alive && !this.enemy2?.kickActive) this.enemyFollows(this.enemy2)
+    if (this.player.x >= 1000 && this.enemy3?.alive && !this.enemy3?.kickActive) this.enemyFollows(this.enemy3)
+    if (this.player.x >= 1500 && this.enemy4?.alive && !this.enemy4?.kickActive) this.enemyFollows(this.enemy4)
+    // if (this.enemy?.alive) this.enemyFollows(this.enemy)
+    // if (this.enemy2 !== undefined) {
+    //   if (this.enemy2.alive) this.enemyFollows(this.enemy2)
+    // }
   }
 
   destroySprite(sprite) {
     sprite.hp.bar.destroy()
     sprite.destroy();
   }
-  enemyFollows(a) {
-    this.physics.moveToObject(a, this.player, 100)
+  enemyFollows(enemy) {
+    if (!enemy.kickActive) {
+      enemy.anims.play('walk_enemy', true);
+    }
+    enemy.followPlayer = true;
+    if (enemy.x < this.player.x) {
+      enemy.flipX = true
+    } else {
+      enemy.flipX = false
+    }
+    this.physics.moveToObject(enemy, this.player, 100)
   }
   level3() {
     //this.corredor.destroy()
@@ -251,10 +300,9 @@ class TesteTile extends Phaser.Scene {
   }
 
   newSprite(x, y, scale = 3) {
-    let enemy = this.physics.add.existing(new Enemy(this, x, y, 'enemy'))
+    let enemy = this.physics.add.existing(new Enemy(this, x, y, 'enemy', scale))
     this.physics.world.enableBody(enemy);
     this.physics.add.collider(this.player, enemy, () => this.hitPlayer(enemy));
-    enemy.setScale(scale)
     return enemy
   }
 
@@ -268,12 +316,12 @@ class TesteTile extends Phaser.Scene {
     if (!enemy.alive) {
       this.destroySprite(enemy);
       this.killEnemys = this.killEnemys + 1;
-      if (this.contEnemys === 1) {
-        this.enemy = this.newSprite(350, 500)
-        this.enemy2 = this.newSprite(400, 500, 5)
-        this.contEnemys = this.contEnemys + 2;
-      }
-      if (this.killEnemys === this.contEnemys) {
+      // if (this.contEnemys === 1) {
+      //   this.enemy = this.newSprite(350, 300)
+      //   this.enemy2 = this.newSprite(400, 300, 5)
+      //   this.contEnemys = this.contEnemys + 2;
+      // }
+      if (this.killEnemys === 4) {
         this.physics.pause();
         this.player.anims.play('win')
         this.player.win = true;

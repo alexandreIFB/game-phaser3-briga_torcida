@@ -4,7 +4,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   keyPressed = false
   win = false
 
-  damageBase = 15
+  damageBase = 10
+
 
   constructor(scene, x = 0, y = 0, texture = 'dude') {
     super(scene, x, y, texture)
@@ -22,9 +23,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       if (anim.key === 'kick' || anim.key === 'punch') {
         this.scene.damageEnemy(this.scene.enemy, this.damageBase * 2);
         this.scene.damageEnemy(this.scene.enemy2, this.damageBase * 2);
+        this.scene.damageEnemy(this.scene.enemy3, this.damageBase * 2);
+        this.scene.damageEnemy(this.scene.enemy4, this.damageBase * 2);
       } else if (anim.key === 'punch') {
         this.scene.damageEnemy(this.scene.enemy, this.damageBase);
-        this.scene.damageEnemy(this.scene.enemy2, this.damageBase);
+        this.scene.damageEnemy(this.scene.enemy2, this.damageBase * 2);
+        this.scene.damageEnemy(this.scene.enemy3, this.damageBase * 2);
+        this.scene.damageEnemy(this.scene.enemy4, this.damageBase);
       }
     }, this);
   }
@@ -56,7 +61,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   update() {
     if (this.win) return;
 
-    const speed = 2.5
+    const speed = 1.5
 
     if (this.alive === false) {
       return;
